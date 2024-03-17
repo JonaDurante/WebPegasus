@@ -1,17 +1,30 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Pegasus.Data.Data;
+using Pegasus.Data.AppyUser;
+using Pegasus.Data.Context;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog((HostBuilderCtx, LoggerConf) =>
+{
+    LoggerConf
+    .WriteTo.Console() // Escribe en la consola
+    .WriteTo.Debug()   // Escriba en debug
+    .ReadFrom.Configuration(HostBuilderCtx.Configuration);
+});
+
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("PegasusWebContextConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+var connectionString = builder.Configuration.GetConnectionString("PegasusWebContextConnection") ?? 
+    throw new InvalidOperationException("Connection string 'PegasusWebContextConnection' not found.");
+
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentity<AppUser, IdentityRole> (options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddControllersWithViews();
 
 builder.Services.Configure<IdentityOptions>(options =>
@@ -46,6 +59,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
+// Agregar SignInManager y UserManager
+builder.Services.AddScoped<SignInManager<AppUser>>();
+builder.Services.AddScoped<UserManager<AppUser>>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -71,6 +88,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.MapRazorPages();
 
 app.Run();
