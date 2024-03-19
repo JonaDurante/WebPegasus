@@ -1,8 +1,17 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pegasus.Data.Context;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((HostBuilderCtx, LoggerConf) =>
+{
+    LoggerConf
+    .WriteTo.Console() // Escribe en la consola
+    .WriteTo.Debug()   // Escriba en debug
+    .ReadFrom.Configuration(HostBuilderCtx.Configuration);
+});
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("PegasusWebContextConnection") ?? 
@@ -14,6 +23,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
@@ -21,7 +31,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.Configure<IdentityOptions>(options =>
 {
     // Password settings.
-    options.Password.RequireDigit = true;
+    options.Password.RequireDigit = true;   
     options.Password.RequireLowercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequireUppercase = true;
@@ -50,9 +60,30 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
+
 builder.Services.AddScoped<SignInManager<IdentityUser>>();
 
 var app = builder.Build();
+
+// Obtener el RoleManager desde el contenedor de dependencias
+using (var scope = app.Services.CreateScope())
+{
+    var serviceProvider = scope.ServiceProvider;
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    // Crear roles si no existen
+    if (!roleManager.RoleExistsAsync("Admin").Result)
+    {
+        IdentityRole adminRole = new IdentityRole("Admin");
+        roleManager.CreateAsync(adminRole).Wait();
+    }
+
+    if (!roleManager.RoleExistsAsync("Usuario").Result)
+    {
+        IdentityRole userRole = new IdentityRole("Usuario");
+        roleManager.CreateAsync(userRole).Wait();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

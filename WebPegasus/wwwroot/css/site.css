@@ -28,13 +28,10 @@ body {
     font-size: 60px;
 }
 
-.italics {
-    font-family: 'Satisfy', cursive;
-}
-
 .custom-h1 {
     text-align: center;
 }
+
 .text-danger {
     color: rgb(215, 29, 29) !important;
 }
@@ -53,4 +50,8 @@ footer {
     max-height: 3vh;
     background-color: #333;
     color: white;
+}
+
+h1, h2, h3 {
+    font-family: 'Satisfy', cursive;
 }
