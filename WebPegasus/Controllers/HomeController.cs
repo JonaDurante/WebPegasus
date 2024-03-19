@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Pegasus.Web.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Pegasus.Web.Controllers
 {
@@ -8,7 +9,7 @@ namespace Pegasus.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager)
         {
             _logger = logger;
         }
@@ -20,6 +21,9 @@ namespace Pegasus.Web.Controllers
 
         public IActionResult Privacy()
         {
+            //hacer método
+
+            //User.Identity.
             return View();
         }
 
