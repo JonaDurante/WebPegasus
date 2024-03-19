@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Pegasus.Data.AppIdentityUser;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 
@@ -81,8 +82,8 @@ namespace Pegasus.Web.Areas.Identity.Pages.Account
 
             [Required]
             [DataType(DataType.Date)]
-            [Display(Name = "Birthdate")]
-            public DateTime Birthdate { get; set; }
+            [Display(Name = "BirthDate")]
+            public DateTime BirthDate { get; set; }
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -129,7 +130,7 @@ namespace Pegasus.Web.Areas.Identity.Pages.Account
                 user.PilaName = Input.FirstName;
                 user.FirstName = Input.PilaName;
                 user.LastName = Input.LastName;
-                user.Birthdate = Input.Birthdate;
+                user.Birthdate = Input.BirthDate;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -141,6 +142,18 @@ namespace Pegasus.Web.Areas.Identity.Pages.Account
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+                    var newClaims = new List<Claim>() {
+                        new Claim(ClaimTypes.GivenName, user.FirstName),
+                        new Claim(ClaimTypes.Surname, user.LastName),
+                        new Claim(ClaimTypes.Name, user.PilaName),
+                        new Claim(ClaimTypes.Role, "User"),
+                        new Claim(ClaimTypes.DateOfBirth, user.Birthdate.ToShortDateString())
+
+                    };
+
+                    await _userManager.AddClaimsAsync(user, newClaims);
+                    _logger.LogInformation("Claims added for user.");
 
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(

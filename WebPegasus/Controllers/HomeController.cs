@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using Pegasus.Web.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using Pegasus.Web.Helpers;
 
 namespace Pegasus.Web.Controllers
 {
@@ -21,8 +23,11 @@ namespace Pegasus.Web.Controllers
 
         public IActionResult Privacy()
         {
-            //hacer método
+            var a = User.GetUserId();
 
+            //hacer método
+            ViewBag.claims = User.Claims;
+            ViewBag.User = User.Identity.Name;
             //User.Identity.
             return View();
         }
