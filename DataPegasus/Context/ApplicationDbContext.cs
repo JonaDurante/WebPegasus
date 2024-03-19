@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Pegasus.Data.AppIdentityUser;
 
 namespace Pegasus.Data.Context;
 
@@ -27,8 +26,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UsuariosTokens");
         modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RolesClaims");
     }
-
-    public DbSet<AppUser> AppUser {  get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var logger = _loggerFactory.CreateLogger<ApplicationDbContext>();
