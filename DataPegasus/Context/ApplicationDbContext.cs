@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Pegasus.Data.AppyUser;
-using System.Reflection.Emit;
+using Pegasus.Data.AppIdentityUser;
 
 namespace Pegasus.Data.Context;
 
@@ -16,18 +15,20 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         _loggerFactory = loggerFactory;
     }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(builder);
-        builder.Entity<AppUser>().ToTable("Usuarios");
-        builder.Entity<IdentityRole>().ToTable("Roles");
-        builder.Entity<IdentityUserRole<string>>().ToTable("UsuariosRoles");
-        builder.Entity<IdentityUserClaim<string>>().ToTable("UsuariosClaims");
-        builder.Entity<IdentityUserLogin<string>>().ToTable("UsuariosLogins");
-        builder.Entity<IdentityUserToken<string>>().ToTable("UsuariosTokens");
-        builder.Entity<IdentityRoleClaim<string>>().ToTable("RolesClaims");
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<IdentityUser>().ToTable("Usuarios");
+        modelBuilder.Entity<IdentityRole>().ToTable("Roles");
+        modelBuilder.Entity<IdentityUserRole<string>>().ToTable("UsuariosRoles");
+        modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("UsuariosClaims");
+        modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UsuariosLogins");
+        modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UsuariosTokens");
+        modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RolesClaims");
     }
 
+    public DbSet<AppUser> AppUser {  get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var logger = _loggerFactory.CreateLogger<ApplicationDbContext>();
@@ -35,5 +36,4 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .EnableSensitiveDataLogging()
             .EnableDetailedErrors();
     }
-
 }

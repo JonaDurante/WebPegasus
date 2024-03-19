@@ -1,28 +1,19 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Pegasus.Data.AppyUser;
 using Pegasus.Data.Context;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((HostBuilderCtx, LoggerConf) =>
-{
-    LoggerConf
-    .WriteTo.Console() // Escribe en la consola
-    .WriteTo.Debug()   // Escriba en debug
-    .ReadFrom.Configuration(HostBuilderCtx.Configuration);
-});
-
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("PegasusWebContextConnection") ?? 
-    throw new InvalidOperationException("Connection string 'PegasusWebContextConnection' not found.");
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentity<AppUser, IdentityRole> (options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
@@ -38,8 +29,8 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequiredUniqueChars = 1;
 
     // Lockout settings.
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+    options.Lockout.MaxFailedAccessAttempts = 3;
     options.Lockout.AllowedForNewUsers = true;
 
     // User settings.
@@ -52,16 +43,14 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     // Cookie settings
     options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
 
     options.LoginPath = "/Identity/Account/Login";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
     options.SlidingExpiration = true;
 });
 
-// Agregar SignInManager y UserManager
-builder.Services.AddScoped<SignInManager<AppUser>>();
-builder.Services.AddScoped<UserManager<AppUser>>();
+builder.Services.AddScoped<SignInManager<IdentityUser>>();
 
 var app = builder.Build();
 
@@ -88,7 +77,6 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
 app.MapRazorPages();
 
 app.Run();

@@ -12,8 +12,13 @@ using Pegasus.Data.Context;
 namespace WebPegasus.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
+<<<<<<<< HEAD:DataPegasus/Migrations/20240317011324_firstMayBe.Designer.cs
     [Migration("20240317011324_firstMayBe")]
     partial class firstMayBe
+========
+    [Migration("20240317021809_CustomUser")]
+    partial class CustomUser
+>>>>>>>> 0.01:DataPegasus/Migrations/20240317021809_CustomUser.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,6 +94,10 @@ namespace WebPegasus.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -139,9 +148,17 @@ namespace WebPegasus.Data.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+<<<<<<<< HEAD:DataPegasus/Migrations/20240317011324_firstMayBe.Designer.cs
                     b.ToTable("AspNetUsers", (string)null);
 
                     b.UseTptMappingStrategy();
+========
+                    b.ToTable("Usuarios", (string)null);
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
+
+                    b.UseTphMappingStrategy();
+>>>>>>>> 0.01:DataPegasus/Migrations/20240317021809_CustomUser.Designer.cs
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -225,7 +242,11 @@ namespace WebPegasus.Data.Migrations
                     b.ToTable("UsuariosTokens", (string)null);
                 });
 
+<<<<<<<< HEAD:DataPegasus/Migrations/20240317011324_firstMayBe.Designer.cs
             modelBuilder.Entity("Pegasus.Data.AppyUser.AppUser", b =>
+========
+            modelBuilder.Entity("Pegasus.Data.AppIdentityUser.AppUser", b =>
+>>>>>>>> 0.01:DataPegasus/Migrations/20240317021809_CustomUser.Designer.cs
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
@@ -240,7 +261,11 @@ namespace WebPegasus.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
+<<<<<<<< HEAD:DataPegasus/Migrations/20240317011324_firstMayBe.Designer.cs
                     b.ToTable("Usuarios", (string)null);
+========
+                    b.HasDiscriminator().HasValue("AppUser");
+>>>>>>>> 0.01:DataPegasus/Migrations/20240317021809_CustomUser.Designer.cs
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
