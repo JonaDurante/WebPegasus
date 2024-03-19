@@ -4,3 +4,13 @@
 <h1>@ViewData["Title"]</h1>
 
 <p>Use this page to detail your site's privacy policy.</p>
+
+@foreach (var item in ViewBag.claims)
+{
+    <p>los claims son: @item</p>
+}
+
+@foreach (var user in ViewBag.User)
+{
+    <p>los datos del user son: @user</p>
+}
