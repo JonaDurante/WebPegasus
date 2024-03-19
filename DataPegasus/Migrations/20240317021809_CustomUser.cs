@@ -5,7 +5,7 @@
 namespace WebPegasus.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class FirstMigrationMaybe : Migration
+    public partial class CustomUser : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
